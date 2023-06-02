@@ -20,9 +20,10 @@ public:
     void rem();
     void list();
     void receipt();
+    void search(); // Added search() function
 };
 
-void shopping ::menu()
+void shopping::menu()
 {
 m:
     int choice;
@@ -64,6 +65,7 @@ m:
         break;
     case 2:
         buyer();
+        break;
     case 3:
         exit(0);
 
@@ -73,7 +75,7 @@ m:
     goto m;
 }
 
-void shopping ::administrator()
+void shopping::administrator()
 {
 m:
     int choice;
@@ -85,6 +87,8 @@ m:
     cout << "\n\t\t\t____3)Delete the product____|\n";
     cout << "\n\t\t\t                            |\n";
     cout << "\n\t\t\t____4)Back to main menu_____|\n";
+    cout << "\n\t\t\t                            |\n";
+    cout << "\n\t\t\t____5)Search the product____|\n"; // Added option to search product
 
     cout << "\n\n\t Please enter your choice: ";
     cin >> choice;
@@ -103,15 +107,18 @@ m:
     case 4:
         menu();
         break;
+    case 5:
+        search(); // Call the search function
+        break;
     default:
         cout << "Invalid Choice!";
     }
     goto m;
 }
 
-void shopping ::buyer()
+void shopping::buyer()
 {
-    m:
+m:
     int choice;
     cout << "\t\t\t Buyer \n";
     cout << "______________________\n";
@@ -126,19 +133,19 @@ void shopping ::buyer()
     {
     case 1:
         receipt();
-        break;  
+        break;
     case 2:
         menu();
-        
+
     default:
         cout << "Invalid Choice";
     }
     goto m;
 }
 
-void shopping ::add()
+void shopping::add()
 {
-    m:
+m:
     fstream data;
     int c;
     int token = 0;
@@ -185,14 +192,14 @@ void shopping ::add()
     else
     {
         data.open("database.txt", ios::app | ios::out);
-        data <<  pcode << " " << pname << " " << price << " " << dis << "\n";
+        data << pcode << " " << pname << " " << price << " " << dis << "\n";
         data.close();
     }
 
     cout << "\n\n\t\t Record inserted !";
 }
 
-void shopping ::edit()
+void shopping::edit()
 {
     fstream data, data1;
     int pkey;
@@ -293,7 +300,7 @@ void shopping::rem()
     }
 }
 
-void shopping ::list()
+void shopping::list()
 {
     fstream data;
     data.open("database.txt", ios::in);
@@ -309,7 +316,7 @@ void shopping ::list()
     data.close();
 }
 
-void shopping ::receipt()
+void shopping::receipt()
 {
 
     fstream data;
@@ -340,7 +347,7 @@ void shopping ::receipt()
 
         do
         {
-            m:
+        m:
             cout << "\n\n Enter product code : ";
             cin >> arrc[c];
             cout << "\n\n Enter product quantity";
@@ -367,26 +374,64 @@ void shopping ::receipt()
             data >> pcode >> pname >> price >> dis;
             while (!data.eof())
             {
-                if (pcode == arrc[i])
+                if (arrc[i] == pcode)
                 {
-                    amount = price * arrq[i];
-                    dis = amount - (amount * dis / 100);
-                    total = total + dis;
-                    cout << "\n"<< pcode << "\t\t" << pname << "\t\t" << arrq[i] << "\t\t" << price << "\t\t" << amount << "\t\t" << dis;
+                    amount = arrq[i] * price;
+                    total = total + amount;
+                    dis = amount - ((amount * dis) / 100);
+
+                    cout << "\n"
+                         << pcode << "\t\t" << pname << "\t\t" << arrq[i] << "\t\t\t" << price << "\t" << amount << "\t\t" << dis;
                 }
                 data >> pcode >> pname >> price >> dis;
             }
+            data.close();
         }
-
-        data.close();
+        cout << "\n\n\t\t\t\t\t\t\tTotal Amount: " << total;
     }
+}
 
-    cout << "\n\n______________________________________";
-    cout << "\n Total Amount: " << total;
+void shopping::search()
+{
+    fstream data;
+    int pkey;
+    int token = 0;
+    cout << "\n\n\t Search product";
+    cout << "\n\n\t Product code: ";
+    cin >> pkey;
+    data.open("database.txt", ios::in);
+    if (!data)
+    {
+        cout << " File doesn't exist! ";
+    }
+    else
+    {
+        data >> pcode >> pname >> price >> dis;
+        while (!data.eof())
+        {
+            if (pcode == pkey)
+            {
+                cout << "\n\n\t Product found: ";
+                cout << "\n\n\t Product code: " << pcode;
+                cout << "\n\n\t Product name: " << pname;
+                cout << "\n\n\t Product price: " << price;
+                cout << "\n\n\t Product discount: " << dis;
+                token++;
+            }
+            data >> pcode >> pname >> price >> dis;
+        }
+        data.close();
+
+        if (token == 0)
+        {
+            cout << "\n\n Record not found! ";
+        }
+    }
 }
 
 int main()
 {
-    shopping s;
-    s.menu();
+    shopping obj;
+    obj.menu();
+    return 0;
 }
